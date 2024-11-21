@@ -1,10 +1,10 @@
 ---
 title: bolt.newのシステムプロンプトから学ぶプロンプトの極意（前編）
 tags:
-  - 'bolt'
+  - Bolt
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-11-22T08:01:40+09:00'
+id: 2bc1a69e7515dea7e7fe
 organization_url_name: null
 slide: false
 ignorePublish: false
