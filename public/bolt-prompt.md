@@ -2,6 +2,10 @@
 title: bolt.newのシステムプロンプトから学ぶプロンプトの極意（前編）
 tags:
   - Bolt
+  - WebContainer
+  - AIアシスタント
+  - Vite
+  - プログラミング
 private: false
 updated_at: '2024-11-22T08:01:40+09:00'
 id: 2bc1a69e7515dea7e7fe
