@@ -1,7 +1,7 @@
 ---
 title: bolt.newのシステムプロンプトから学ぶプロンプトの極意（前編）
 tags:
-  - '#Bolt #WebContainer #AIアシスタント #システム制約 #Nodejs #Vite #プログラミング'
+  - 'bolt'
 private: false
 updated_at: ''
 id: null
