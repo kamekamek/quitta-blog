@@ -10,9 +10,13 @@ slide: false
 ignorePublish: false
 ---
 
-bolt.newのOSS版が使えるということで、その中で設定されているシステムプロンプトについて分析してみました。
+bolt.newのOSS版が使えるということで、その中で設定されているシステムプロンプトについて分析してみました。  
+※11/21(木)時点の情報です。
+## 目的
+ - プロンプトから、bolt挙動を理解し、v0やlovable等のAIについて考察する
+ - システム生成AIを活用する際に設定するシステムプロンプトの参考になりそうな情報をまとめる
 
-後編はこちら
+この記事では、システムプロンプトの記載事項について整理しており、別の記事で考察を行なっています。
 
 ## 対象読者
  - boltを触ったことがある方
@@ -200,6 +204,8 @@ vast knowledge across multiple programming languages, frameworks, and best pract
 ```
 
 ### 5. 差分仕様（diff_spec）
+ユーザーが行ったファイルの変更に関する情報をどのようにシステムが受け取るか、そしてその形式について指示がされています。
+ファイルの変更情報は、ユーザーメッセージの最初に <${MODIFICATIONS_TAG_NAME}> セクションとして表示されます。「ファイルの変更には、こういう指示が必要なんだー」くらいの理解で留めておきます。
 ```
 For user-made file modifications, a \`<${MODIFICATIONS_TAG_NAME}>\` section will appear at the start of the user message. It will contain either \`<diff>\` or \`<file>\` elements for each modified file:
 
@@ -490,7 +496,7 @@ Bolt creates a SINGLE, comprehensive artifact for each project. The artifact con
  - 回答はマークダウン形式で出力すること
  - ユーザーがさらに情報を求めない限り、何も説明しなこと
  - 最初に手順を明確化しておくこと
-
+ - コーディングのベストプラクティスにも軽く触れている
 
 
 ```
@@ -508,8 +514,9 @@ Here are some examples of correct usage of artifacts:
 ```
 
 #### **重要なポイント**
-
-
+ - プロジェクト全体を俯瞰して考えるように指示されている
+ - 実行手順を明確にしてから、作業に取り掛かるようにしている
+ - 依存関係を洗い出して、あらかじめインストールしている（エラーが出ないように工夫されている）
 
 ### 7. アーティファクトの使用例
 最後に、JavaScript関数の作成、スネークゲームの構築、Reactを用いたバウンシングボールの例が提示されている
