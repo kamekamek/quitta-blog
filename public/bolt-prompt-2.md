@@ -7,8 +7,8 @@ tags:
   - vite
   - WebContainer
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-11-23T11:25:25+09:00'
+id: 982166458b59aac7666e
 organization_url_name: null
 slide: false
 ignorePublish: false

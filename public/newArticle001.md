@@ -4,7 +4,7 @@ tags:
   - AI
   - Bolt
 private: false
-updated_at: '2024-11-21T22:12:16+09:00'
+updated_at: '2024-11-23T11:25:25+09:00'
 id: 3ae9dbf084c2ef1584ff
 organization_url_name: null
 slide: false
