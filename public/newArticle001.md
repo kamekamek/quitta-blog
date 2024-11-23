@@ -1,5 +1,5 @@
 ---
-title: bolt.newをローカル環境で動かす完全ガイド
+title: bolt.newをローカル環境で動かす
 tags:
   - AI
   - Bolt
