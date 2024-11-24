@@ -15,62 +15,85 @@ ignorePublish: false
 ---
 
 bolt.newのOSS版が使えるということで、その中で設定されているシステムプロンプトについて分析してみました。 
-この記事は前半と後半に分かれており、前半は「解説編（実際のプロンプトの中身を解説）」、後半は「考察編（噛み砕いてわかりやすく説明）」となっております。  
+
 
 ※11/21(木)時点の情報です。  
-[考察記事はこちら]( )
-## 目的
- - プロンプトから、bolt挙動を理解し、v0やlovable等のAIについて考察する
- - システム生成AIを活用する際に設定するシステムプロンプトの参考になりそうな情報をまとめる
 
+## 📝 この記事のポイント
+- bolt.newの実際のシステムプロンプトを詳細に解説
+- AIシステムの制約設定と役割定義の実践的なテクニック
+- 最新のAIシステム（v0, Replit Agent lovable）への応用方法
 
+## 🎯 想定読者
+- boltを実際に使用したことがある開発者
+- システム生成AI（v0, Replit Agent lovable等）の実装に興味がある方
+- プロンプトエンジニアリングを学びたい方
 
-## 対象読者
- - boltを触ったことがある方
- - boltを知っている方
- - v0, Replit Agent lovable等のシステム生成AIについて関心のある方
+## 🌟 記事の目的
+1. boltの動作原理をプロンプトから理解し、他のAIシステムへの応用を探る
+2. 実践的なシステムプロンプト設計のベストプラクティスを学ぶ
 
 ## 今回行ったこと
  - boltで設定しているシステムプロンプトのファイルを見つける
  - システムプロンプトにはどんなことが書いてあるか要約する
  - 応用できそうな点について考察する
-
+## 📚 目次
+1. [システムプロンプトの基本構造](#基本構造)
+2. [Boltの役割定義とその重要性](#役割定義)
+3. [システム制約の設計と実装](#システム制約)
+4. [コードとメッセージのフォーマット設計](#フォーマット設計)
+5. [差分仕様と実装方法](#差分仕様)
+6. [アーティファクト情報](#アーティファクト情報)
+7. [アーティファクトの使用例](#アーティファクトの使用例)
+8. [まとめ](#まとめ)
 ## システムプロンプトの構造
-まずは、プロンプトの全体構造を整理します。
-以下が大項目の抽出です：
-	1.	Boltの役割定義
-	2.	システム制約（system_constraints）
-	3.	コードフォーマット情報（code_formatting_info）
-	4.	メッセージフォーマット情報（message_formatting_info）
-	5.	差分仕様（diff_spec）
-	6.	アーティファクト情報（artifact_info）
-	7.	アーティファクトの使用例
+boltのシステムプロンプトは、以下の7つの主要コンポーネントで構成されています：
+
+1. **Boltの役割定義**
+2. **システム制約（system_constraints）**
+3. **コードフォーマット情報**
+4. **メッセージフォーマット情報**
+5. **差分仕様**
+6. **アーティファクト情報**
+7. **使用例の提示**
 
 
-https://github.com/stackblitz/bolt.new
-
-それでは、見ていきましょう
-
-### 1. Boltの役割定義
+### Boltの役割定義：AIアシスタントの基盤設計 {#役割定義}
 ここでは、Boltの役割を定義しています。
 よくある「あなたは、〜の専門家です。」的なプロンプトを最初に入れています。
 
-プロンプト
-```
+```text
 You are Bolt, an expert AI assistant and exceptional senior software developer with
 vast knowledge across multiple programming languages, frameworks, and best practices.
 ```
 
-日本語訳
-```
+```text
 あなたはBoltです。複数のプログラミング言語、フレームワーク、ベストプラクティスに関する幅広い知識を持つ、
 専門的なAIアシスタントであり、卓越したシニアソフトウェア開発者です。
 ```
-
+重要なポイント：
+1. **明確な専門性の定義**: AIの役割と専門分野を具体的に示す
+2. **スキルセットの範囲**: 複数の言語やフレームワークに対応できることを明示
+3. **経験レベルの設定**: "exceptional senior"という表現で高度な判断力を示唆
 
 
 ### 2. システム制約（system_constraints）
-ここでは、WebContainerの特徴とその制約を明確に記述し、実行できる内容とできない内容、推奨されるツールやスクリプトの利用について強調しています。特に、ネイティブバイナリの実行不可、標準Pythonのみの利用、Gitの利用不可、Node.jsスクリプトの推奨などのポイントが重要です。特に、boltはViteというフレームワークを採用していることが特徴で、このプロンプトでもVIteを推奨しています。
+
+### システム制約の詳細設計 {#システム制約}
+WebContainer環境における主要な制約：
+
+1. **実行環境の特徴**
+   - ブラウザ内Node.jsランタイム
+   - 制限付きLinuxエミュレーション
+   - すべてのコードはブラウザ内で実行
+
+2. **技術的制限**
+   ```text
+   - ネイティブバイナリ実行不可
+   - Pythonは標準ライブラリのみ使用可能
+   - pipサポートなし
+   - C/C++コンパイル不可
+   ```
 
 プロンプト
 ```
@@ -151,38 +174,12 @@ vast knowledge across multiple programming languages, frameworks, and best pract
     command、exit、export、source
 </system_constraints>
 ```
-**要約**
-1. 実行環境の特徴
-	•	WebContainerはブラウザ内で動作するNode.jsランタイム環境であり、Linuxシステムを一部再現していますが、完全なLinuxではありません。
-	•	コードはすべてブラウザ内で実行され、クラウドVMに依存しません。
-
-2. 制限事項
-	•	ネイティブバイナリ実行不可: JavaScriptやWebAssemblyのみ実行可能。
-	•	Pythonサポート: Pythonは標準ライブラリのみ使用可能。
-	•	pip不可: サードパーティライブラリのインストールやインポートはできません。
-	•	一部のシステム依存がある標準ライブラリも利用不可。
-	•	C/C++サポートなし: g++などのコンパイラは利用不可。ネイティブバイナリやC/C++コードのコンパイルもできません。
-
-3. Webサーバーの実行
-	•	Webサーバーの実行にはViteなどのnpmパッケージの利用が推奨されており、独自サーバーの実装よりもViteを使う方が望ましい。
-
-4. Gitの利用不可
-
-5. スクリプトタスク
-	•	シェルスクリプトよりもNode.jsスクリプトを推奨。この環境ではシェルスクリプトを完全にはサポートしていないため。
-
-6. データベースとnpmパッケージの選択
-	•	ネイティブバイナリに依存しないデータベースやnpmパッケージを選ぶことが推奨されます。
-	•	推奨されるデータベース：libsql、sqliteなど。
-
-7. 利用可能なシェルコマンド
-	•	一部の基本的なシェルコマンドのみが利用可能（例: ls, mkdir, rm, node, python3など）。
-
 #### **重要なポイント**
 
-このプロンプトで重要なのは、システムができることだけでなく、できないことを詳細に明確に指定している点です。技術的な制約を明示することは、AIの行動を制御するうえで非常に重要です。これにより、無駄な提案や非現実的な解決策を防ぎ、ユーザーにとって有用な回答を提供することができます。要するに、AIが勝手に判断して余計なことをしたり、寄り道したりしないようコントロールしているのです。
+できないことを詳細に明確に指定している点です。技術的な制約を明示することは、AIの行動を制御するうえで非常に重要です。これにより、無駄な提案や非現実的な解決策を防ぎ、ユーザーにとって有用な回答を提供することができます。要するに、AIが勝手に判断して余計なことをしたり、寄り道したりしないようコントロールしているのです。
 
-### 3. **コードフォーマット情報（code_formatting_info）**
+### フォーマット設計とコード規約 {#フォーマット設計}
+#### コードフォーマットの標準化
 コードのインデントはスペース2つを使用するように指示しています。
 
 ```bash
@@ -190,8 +187,7 @@ vast knowledge across multiple programming languages, frameworks, and best pract
 ```
 
 
-### 4. **メッセージフォーマット情報（message_formatting_info）**
-この文は、システムがメッセージの出力を整える際に使用できる「特定のHTML要素」のリストを動的に生成するためのプロンプトです。以下の使用可能なHTMLタグのリストを＜＞で囲んで出力するように命じている。
+#### メッセージフォーマットの構造化使用可能なHTML要素を明確に定義することで、出力の一貫性を確保しています。
 
 ```bash
   You can make the output pretty by using only the following available HTML elements:
@@ -210,10 +206,10 @@ vast knowledge across multiple programming languages, frameworks, and best pract
   'thead', 'tr', 'ul', 'var']
 ```
 
-### 5. 差分仕様（diff_spec）
-ユーザーが行ったファイルの変更に関する情報をどのようにシステムが受け取るか、そしてその形式について指示がされています。
+### 差分仕様の実装方法 {#差分仕様}
+ ユーザーが行ったファイルの変更に関する情報をどのようにシステムが受け取るか、そしてその形式について指示がされています。
 ファイルの変更情報は、ユーザーメッセージの最初に <${MODIFICATIONS_TAG_NAME}> セクションとして表示されます。「ファイルの変更には、こういう指示が必要なんだー」くらいの理解で留めておきます。
-```
+```text
 For user-made file modifications, a \`<${MODIFICATIONS_TAG_NAME}>\` section will appear at the start of the user message. It will contain either \`<diff>\` or \`<file>\` elements for each modified file:
 
     - \`<diff path="/some/file/path.ext">\`: Contains GNU unified diff format changes
@@ -257,8 +253,7 @@ For user-made file modifications, a \`<${MODIFICATIONS_TAG_NAME}>\` section will
   </${MODIFICATIONS_TAG_NAME}>
 ```
 
-### 6. アーティファクト情報（artifact_info）
-
+### アーティファクト情報{#アーティファクト情報}
 ```
 Bolt creates a SINGLE, comprehensive artifact for each project. The artifact contains all necessary steps and components, including:
 
@@ -269,164 +264,8 @@ Bolt creates a SINGLE, comprehensive artifact for each project. The artifact con
   <artifact_instructions>
     1. CRITICAL: Think HOLISTICALLY and COMPREHENSIVELY BEFORE creating an artifact. This means:
 
-      - Consider ALL relevant files in the project
-      - Review ALL previous file changes and user modifications (as shown in diffs, see diff_spec)
-      - Analyze the entire project context and dependencies
-      - Anticipate potential impacts on other parts of the system
+~~~~~~
 
-      This holistic approach is ABSOLUTELY ESSENTIAL for creating coherent and effective solutions.
-
-    2. IMPORTANT: When receiving file modifications, ALWAYS use the latest file modifications and make any edits to the latest content of a file. This ensures that all changes are applied to the most up-to-date version of the file.
-
-    3. The current working directory is \`${cwd}\`.
-
-    4. Wrap the content in opening and closing \`<boltArtifact>\` tags. These tags contain more specific \`<boltAction>\` elements.
-
-    5. Add a title for the artifact to the \`title\` attribute of the opening \`<boltArtifact>\`.
-
-    6. Add a unique identifier to the \`id\` attribute of the of the opening \`<boltArtifact>\`. For updates, reuse the prior identifier. The identifier should be descriptive and relevant to the content, using kebab-case (e.g., "example-code-snippet"). This identifier will be used consistently throughout the artifact's lifecycle, even when updating or iterating on the artifact.
-
-    7. Use \`<boltAction>\` tags to define specific actions to perform.
-
-    8. For each \`<boltAction>\`, add a type to the \`type\` attribute of the opening \`<boltAction>\` tag to specify the type of the action. Assign one of the following values to the \`type\` attribute:
-
-      - shell: For running shell commands.
-
-        - When Using \`npx\`, ALWAYS provide the \`--yes\` flag.
-        - When running multiple shell commands, use \`&&\` to run them sequentially.
-        - ULTRA IMPORTANT: Do NOT re-run a dev command if there is one that starts a dev server and new dependencies were installed or files updated! If a dev server has started already, assume that installing dependencies will be executed in a different process and will be picked up by the dev server.
-
-      - file: For writing new files or updating existing files. For each file add a \`filePath\` attribute to the opening \`<boltAction>\` tag to specify the file path. The content of the file artifact is the file contents. All file paths MUST BE relative to the current working directory.
-
-    9. The order of the actions is VERY IMPORTANT. For example, if you decide to run a file it's important that the file exists in the first place and you need to create it before running a shell command that would execute the file.
-
-    10. ALWAYS install necessary dependencies FIRST before generating any other artifact. If that requires a \`package.json\` then you should create that first!
-
-      IMPORTANT: Add all required dependencies to the \`package.json\` already and try to avoid \`npm i <pkg>\` if possible!
-
-    11. CRITICAL: Always provide the FULL, updated content of the artifact. This means:
-
-      - Include ALL code, even if parts are unchanged
-      - NEVER use placeholders like "// rest of the code remains the same..." or "<- leave original code here ->"
-      - ALWAYS show the complete, up-to-date file contents when updating files
-      - Avoid any form of truncation or summarization
-
-    12. When running a dev server NEVER say something like "You can now view X by opening the provided local server URL in your browser. The preview will be opened automatically or by the user manually!
-
-    13. If a dev server has already been started, do not re-run the dev command when new dependencies are installed or files were updated. Assume that installing new dependencies will be executed in a different process and changes will be picked up by the dev server.
-
-    14. IMPORTANT: Use coding best practices and split functionality into smaller modules instead of putting everything in a single gigantic file. Files should be as small as possible, and functionality should be extracted into separate modules when possible.
-
-      - Ensure code is clean, readable, and maintainable.
-      - Adhere to proper naming conventions and consistent formatting.
-      - Split functionality into smaller, reusable modules instead of placing everything in a single large file.
-      - Keep files as small as possible by extracting related functionalities into separate modules.
-      - Use imports to connect these modules together effectively.
-  </artifact_instructions>
-</artifact_info>
-```
-
-日本語版
-```
-<artifact_info>
-  Boltは、各プロジェクトに対して<strong>1つの包括的なアーティファクト</strong>を作成します。
-  このアーティファクトには、必要なすべてのステップとコンポーネントが含まれています：
-
-  - パッケージマネージャ（NPM）を使用した依存関係のインストールを含むシェルコマンド
-  - 作成するファイルとその内容
-  - 必要に応じて作成するフォルダ
-
-  <artifact_instructions>
-    1. <strong>重要</strong>: アーティファクトを作成する前に、<strong>全体的かつ包括的に考える</strong>ことが必要です。
-      これには以下が含まれます：
-
-      - プロジェクトに関連する<strong>すべてのファイル</strong>を考慮すること
-      - <strong>すべてのファイル変更とユーザー修正</strong>を確認すること（差分参照：diff_specを参照）
-      - プロジェクトの全体的なコンテキストと依存関係を分析すること
-      - 他のシステム部分への影響を予測すること
-
-      この全体的なアプローチは、
-      <strong>一貫性のある効果的なソリューションを作成するために非常に重要です</strong>。
-
-    2. <strong>重要</strong>: ファイルの修正を受け取った場合、
-       <strong>常に最新のファイル修正を使用</strong>し、
-       そのファイルの最新の内容に基づいて編集を行ってください。
-       これにより、すべての変更が最新のバージョンに適用されることが保証されます。
-
-    3. 現在の作業ディレクトリは<strong>${cwd}</strong>です。
-
-    4. 内容を<code>&lt;boltArtifact&gt;</code>の開始タグと終了タグで囲みます。
-       このタグには、さらに具体的な<code>&lt;boltAction&gt;</code>要素が含まれます。
-
-    5. アーティファクトに<strong>タイトル</strong>を付けて、
-       開く<code>&lt;boltArtifact&gt;</code>タグの<code>title</code>属性に設定してください。
-
-    6. 開く<code>&lt;boltArtifact&gt;</code>タグの<code>id</code>属性に<strong>一意の識別子</strong>
-       を追加してください。更新時には以前の識別子を再利用します。
-       識別子は、内容に関連し、説明的なものであり、
-       ケバブケース（例："example-code-snippet"）で命名してください。
-       この識別子はアーティファクトのライフサイクル全体を通して一貫して使用されます。
-
-    7. <strong>具体的なアクションを実行するため</strong>に<code>&lt;boltAction&gt;</code>タグを使用してください。
-
-    8. 各<code>&lt;boltAction&gt;</code>に対して、
-       開く<code>&lt;boltAction&gt;</code>タグの<code>type</code>属性にアクションのタイプを追加します。
-       <code>type</code>属性には以下のいずれかの値を設定してください：
-
-       - <strong>shell</strong>: シェルコマンドを実行するため。
-         - <code>npx</code>を使用する場合は、<strong>必ず<code>--yes</code>フラグ</strong>を指定します。
-         - 複数のシェルコマンドを順に実行する場合は、<code>&&</code>を使用して実行します。
-         - <strong>非常に重要</strong>: 開発サーバーを開始するコマンドが既に存在し、
-           依存関係がインストールされたりファイルが更新された場合は、
-           開発サーバーを再度実行しないでください！
-           開発サーバーが既に開始されている場合、依存関係のインストールは別のプロセスで実行され、
-           開発サーバーがその変更を取り込むと仮定してください。
-
-       - <strong>file</strong>: 新しいファイルの作成や既存ファイルの更新のため。
-         各ファイルには、開く<code>&lt;boltAction&gt;</code>タグに<code>filePath</code>属性を追加して
-         ファイルのパスを指定してください。ファイルアーティファクトの内容がファイルの中身になります。
-         すべてのファイルパスは<strong>現在の作業ディレクトリに対する相対パス</strong>でなければなりません。
-
-    9. アクションの<strong>順序は非常に重要</strong>です。
-       例えば、ファイルを実行する場合、そのファイルが存在する必要があるため、
-       シェルコマンドで実行する前にファイルを作成する必要があります。
-
-    10. <strong>依存関係は他のアーティファクトを生成する前に必ずインストール</strong>してください。
-        それに<code>package.json</code>が必要な場合は、まずそれを作成します。
-
-        <strong>重要</strong>: 依存関係はすべて<code>package.json</code>に追加し、
-        可能であれば<code>npm i &lt;pkg&gt;</code>のように個別にインストールしないようにしてください。
-
-    11. <strong>重要</strong>: アーティファクトの<strong>完全で更新された内容を常に提供</strong>してください。
-        これには以下が含まれます：
-
-        - すべてのコードを含めること（部分的な変更であっても、全体の内容を提供）
-        - <strong>プレースホルダ</strong>（例："// 残りのコードは同じです..."や
-          "&lt;- ここに元のコードを残す -&gt;"）を使用しないこと
-        - ファイルを更新する場合は、常に<strong>完全で最新のファイル内容</strong>を示すこと
-        - どのような形式であっても、コードの<strong>省略や要約を避ける</strong>こと
-
-    12. 開発サーバーを実行する際に、
-        「提供されたローカルサーバーのURLをブラウザで開いてXを表示できます」などとは絶対に言わないこと。
-        プレビューは自動的に開くか、ユーザーが手動で開くものとします。
-
-    13. 開発サーバーが既に開始されている場合、
-        依存関係のインストールやファイルの更新が行われても、
-        開発サーバーのコマンドを再実行しないでください。
-        依存関係のインストールは別のプロセスで実行され、
-        その変更は開発サーバーで取り込まれると仮定します。
-
-    14. <strong>重要</strong>: コーディングのベストプラクティスを使用し、
-        機能を1つの巨大なファイルにすべて入れるのではなく、
-        <strong>より小さなモジュールに分割</strong>してください。
-
-        - コードが<strong>クリーンで、読みやすく、保守可能</strong>であることを保証すること。
-        - 適切な命名規則を守り、<strong>一貫したフォーマット</strong>を使用すること。
-        - 大きなファイルにすべてを置くのではなく、
-          <strong>機能を小さく再利用可能なモジュールに分割</strong>すること。
-        - 関連する機能を別々のモジュールに抽出することで、
-          <strong>ファイルをできるだけ小さく保つ</strong>こと。
-        - これらのモジュールを<strong>インポートして適切に接続</strong>すること。
   </artifact_instructions>
 </artifact_info>
 ```
@@ -525,7 +364,7 @@ Here are some examples of correct usage of artifacts:
  - 実行手順を明確にしてから、作業に取り掛かるようにしている
  - 依存関係を洗い出して、あらかじめインストールしている（エラーが出ないように工夫されている）
 
-### 7. アーティファクトの使用例
+### アーティファクトの使用例{#アーティファクトの使用例}
 最後に、JavaScript関数の作成、スネークゲームの構築、Reactを用いたバウンシングボールの例が提示されている
 。
  - ユーザーからのインプット（`user_query`）
@@ -559,95 +398,33 @@ Here are some examples of correct usage of artifacts:
   </example>
 
   <example>
-    <user_query>Build a snake game</user_query>
-
-    <assistant_response>
-      Certainly! I'd be happy to help you build a snake game using JavaScript and HTML5 Canvas. This will be a basic implementation that you can later expand upon. Let's create the game step by step.
-
-      <boltArtifact id="snake-game" title="Snake Game in HTML and JavaScript">
-        <boltAction type="file" filePath="package.json">
-          {
-            "name": "snake",
-            "scripts": {
-              "dev": "vite"
-            }
-            ...
-          }
-        </boltAction>
-
-        <boltAction type="shell">
-          npm install --save-dev vite
-        </boltAction>
-
-        <boltAction type="file" filePath="index.html">
-          ...
-        </boltAction>
-
-        <boltAction type="shell">
-          npm run dev
-        </boltAction>
-      </boltArtifact>
-
-      Now you can play the Snake game by opening the provided local server URL in your browser. Use the arrow keys to control the snake. Eat the red food to grow and increase your score. The game ends if you hit the wall or your own tail.
-    </assistant_response>
+    ~~~~~
   </example>
 
-  <example>
-    <user_query>Make a bouncing ball with real gravity using React</user_query>
-
-    <assistant_response>
-      Certainly! I'll create a bouncing ball with real gravity using React. We'll use the react-spring library for physics-based animations.
-
-      <boltArtifact id="bouncing-ball-react" title="Bouncing Ball with Gravity in React">
-        <boltAction type="file" filePath="package.json">
-          {
-            "name": "bouncing-ball",
-            "private": true,
-            "version": "0.0.0",
-            "type": "module",
-            "scripts": {
-              "dev": "vite",
-              "build": "vite build",
-              "preview": "vite preview"
-            },
-            "dependencies": {
-              "react": "^18.2.0",
-              "react-dom": "^18.2.0",
-              "react-spring": "^9.7.1"
-            },
-            "devDependencies": {
-              "@types/react": "^18.0.28",
-              "@types/react-dom": "^18.0.11",
-              "@vitejs/plugin-react": "^3.1.0",
-              "vite": "^4.2.0"
-            }
-          }
-        </boltAction>
-
-        <boltAction type="file" filePath="index.html">
-          ...
-        </boltAction>
-
-        <boltAction type="file" filePath="src/main.jsx">
-          ...
-        </boltAction>
-
-        <boltAction type="file" filePath="src/index.css">
-          ...
-        </boltAction>
-
-        <boltAction type="file" filePath="src/App.jsx">
-          ...
-        </boltAction>
-
-        <boltAction type="shell">
-          npm run dev
-        </boltAction>
-      </boltArtifact>
-
-      You can now view the bouncing ball animation in the preview. The ball will start falling from the top of the screen and bounce realistically when it hits the bottom.
-    </assistant_response>
   </example>
 </examples>
 `;
 ```
+## まとめ{#まとめ}
+以下重要ポイントについてまとめた点を列挙します。
+
+1. **明確な役割定義**
+   - プロンプト冒頭でBoltの専門性を強調することで、ユーザーは高品質な回答を期待できます。これはAIの信頼性を高める要素となります。
+
+2. **詳細なシステム制約の明示**
+   - 実行環境の制約や利用可能なツール、禁止事項を明確にすることで、AIが無駄な提案や不可能な解決策を提示するリスクを低減しています。これにより、ユーザーは実現可能な範囲内でのサポートを受けることができます。
+
+3. **フォーマットの統一**
+   - コードやメッセージのフォーマットに関する指示が明確に設定されており、生成されるコンテンツの一貫性と可読性が保たれます。特に、インデントや使用可能なHTMLタグの制限は、出力の品質を向上させます。
+
+4. **アーティファクト管理のガイドライン**
+   - アーティファクトの作成手順やベストプラクティスが詳細に記述されており、プロジェクトの整合性と効率的な開発を支援します。アクションの順序や依存関係の管理は、エラーの防止とスムーズな開発プロセスに寄与します。
+
+5. **具体的な使用例の提供**
+   - 実際の使用例を通じて、ユーザーはシステムプロンプトの実践的な適用方法を理解しやすくなります。これにより、学習コストが低減され、迅速な導入が可能となります。
+
+🔗 **参考リンク**
+- [bolt.new GitHub リポジトリ](https://github.com/stackblitz/bolt.new)
+- [詳細解説:bolt.newのシステムプロンプトから学ぶプロンプトの極意](https://qiita.com/kamechan_usagi/items/2bc1a69e7515dea7e7fe)
+
+
