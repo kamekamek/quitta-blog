@@ -1,13 +1,13 @@
 ---
 title: sattoを活用した一括処理スキルの実践解説
 tags:
-  - 'satto'
-  - 'タスク管理'
-  - 'Notion連携'
-  - '一括処理'
+  - タスク管理
+  - 一括処理
+  - satto
+  - Notion連携
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-12-10T22:27:23+09:00'
+id: 31521377f707b46e923d
 organization_url_name: null
 slide: false
 ignorePublish: false
