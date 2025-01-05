@@ -6,7 +6,7 @@ tags:
   - browser-use
   - browser-use-webui
 private: false
-updated_at: '2025-01-05T14:52:48+09:00'
+updated_at: '2025-01-05T14:55:09+09:00'
 id: 37e4442ae6241de8f7fe
 organization_url_name: null
 slide: false
