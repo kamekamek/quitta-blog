@@ -6,7 +6,7 @@ tags:
   - satto
   - Notion連携
 private: false
-updated_at: '2024-12-10T22:27:23+09:00'
+updated_at: '2025-01-05T14:52:47+09:00'
 id: 31521377f707b46e923d
 organization_url_name: null
 slide: false

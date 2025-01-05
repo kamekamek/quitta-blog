@@ -1,13 +1,13 @@
 ---
 title: browser-use-webui入門ガイド
 tags:
-  - browser-use-webui
-  - browser-use
   - AI
   - AIエージェント
+  - browser-use
+  - browser-use-webui
 private: false
-updated_at: ''
-id: null
+updated_at: '2025-01-05T14:52:48+09:00'
+id: 37e4442ae6241de8f7fe
 organization_url_name: null
 slide: false
 ignorePublish: false
