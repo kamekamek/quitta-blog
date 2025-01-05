@@ -70,10 +70,18 @@ source .venv/bin/activate
 #### ステップ 2： browser-use-webuiのインストール
 
 1. 仮想環境が有効化されていることを確認します。
-2. 以下のコマンドを実行してbrowser-use-webuiをインストールします。
+2. 以下のコマンドを実行してbrowser-useと必要な依存関係をインストールします。
 
 ```bash
 pip install browser-use-webui
+```
+
+```bash
+# playwrightのインストール
+playwright install
+
+# 依存関係のインストール
+pip install -r requirements.txt
 ```
 
 #### ステップ 3：環境変数の設定
