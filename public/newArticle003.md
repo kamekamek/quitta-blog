@@ -74,9 +74,7 @@ source .venv/bin/activate
 
 ```bash
 pip install browser-use-webui
-```
 
-```bash
 # playwrightのインストール
 playwright install
 
