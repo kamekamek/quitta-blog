@@ -33,18 +33,18 @@ browser-use-webuiは、browser-useをウェブブラウザ上で簡単に操作�
 
 #### ステップ 0: リポジトリのクローン
 
-1. まず、Browser-use-webuiの[GitHubリポジトリ](https://github.com/warmshao/browser-use-webui)をクローンします。
+1. まず、Browser-use-webuiの[GitHubリポジトリ](https://github.com/browser-use/web-ui)をクローンします。
 2. ターミナルまたはコマンドプロンプトを開きます。
 3. 以下のコマンドを実行してリポジトリをクローンします。
 
 ```bash
-git clone https://github.com/warmshao/browser-use-webui.git
+git clone https://github.com/browser-use/web-ui.git
 ```
 
 4. クローンしたディレクトリに移動します。
 
 ```bash
-cd browser-use-webui
+cd web-ui
 ```
 
 #### ステップ 1：Python仮想環境の作成
@@ -53,7 +53,7 @@ cd browser-use-webui
 2. ターミナルまたはコマンドプロンプトを開き、以下のコマンドを実行します。
 
 ```bash
-python -m venv .venv
+uv venv --python 3.11
 ```
 
 3. 以下のコマンドを実行して仮想環境を有効化します。
@@ -66,13 +66,10 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-#### ステップ 2： browser-use-webuiのインストール
+#### ステップ 2： 依存関係のインストール
 
-1. 仮想環境が正しく動いているか確認しましょう。
-2. 次に、以下のコマンドを実行してbrowser-useと必要なものをインストールします。
 
 ```bash
-pip install browser-use-webui
 
 # playwrightのインストール
 playwright install
@@ -82,9 +79,8 @@ pip install -r requirements.txt
 ```
 
 #### ステップ 3：環境変数の設定
-
-1. browser-use-webuiを使用するためには、いくつかの環境変数を設定する必要があります。
-2. browser-use-webuiのルートディレクトリに`.env`ファイルを作成します。
+1. web-uiを使用するためには、いくつかの環境変数を設定する必要があります。
+2. web-uiのルートディレクトリに`.env`ファイルを作成します。
 3. `.env.example`ファイルを`.env`ファイルにコピーします。
 4. `.env`ファイルを編集し、LLMのAPIキーなどの環境変数を設定します。例として、Deep Seek APIを利用する場合には、以下のようにAPIキーを記述します。
 
@@ -92,18 +88,19 @@ pip install -r requirements.txt
 DEEPSEEK_API_KEY=your_deepseek_api_key
 ```
 
-5. 自分のブラウザを使用する場合は、`CHROME_PATH`にブラウザの実行ファイルパスを、`CHROME_USER_DATA`にブラウザのユーザーデータディレクトリを設定します。
+5. （オプション）自分のブラウザを使用する場合は、`CHROME_PATH`にブラウザの実行ファイルパスを、`CHROME_USER_DATA`にブラウザのユーザーデータディレクトリを設定します。
 
 Windowsの場合
 ```plaintext
-CHROME_PATH=C:\Program Files\Google\Chrome\Application\chrome.exe
-CHROME_USER_DATA=C:\Users\<YourUsername>\AppData\Local\Google\Chrome\User Data
+CHROME_PATH="C:\Program Files\Google\Chrome\Application\chrome.exe"
+CHROME_USER_DATA="C:\Users\YourUsername\AppData\Local\Google\Chrome\User Data"
 ```
+注: YourUsernameWindows システムの場合は実際の Windows ユーザー名に置き換えてください。
 
 Macの場合:
 ```plaintext
-CHROME_PATH=/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome
-CHROME_USER_DATA=~/Library/Application\ Support/Google/Chrome
+CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+CHROME_USER_DATA="~/Library/Application Support/Google/Chrome/Profile 1"
 ```
 
 #### ステップ 4：WebUIの実行
